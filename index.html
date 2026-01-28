@@ -12,39 +12,32 @@
         <div class="game-container">
             <h1 class="text-center mb-5 title">Rock, Paper, Scissors, Lizard, Spock</h1>
             
+            <!-- Mode Toggle Buttons -->
             <div class="row mb-4">
-    <div class="col-md-6 text-center">
-        <h3>Player 1 Choice</h3>
-        <input type="text" id="player1Choice" class="form-control" placeholder="Enter Rock, Paper, Scissors, Lizard, or Spock">
-    </div>
-    <div class="col-md-6 text-center">
-        <h3>Player 2 Choice</h3>
-        <input type="text" id="player2Choice" class="form-control" placeholder="Enter Rock, Paper, Scissors, Lizard, or Spock">
-    </div>
-</div>
-<button id="determineWinnerBtn" class="btn btn-primary">Determine Winner</button>
-<div id="result" class="mt-4"></div>
-                <div class="col-md-6 text-center">
+                <div class="col-12 text-center">
+                    <button id="cpuToggleBtn" class="btn btn-success me-2">CPU Mode</button>
+                    <button id="pvpToggleBtn" class="btn btn-outline-success">PvP Mode</button>
+                </div>
+            </div>
+            
+            <!-- CPU Mode Section -->
+            <div id="cpuSection">
+            <div class="row mb-4">
                     <h3>Your Choice</h3>
                     <div class="choices-grid">
                         <button class="choice-btn" data-move="Rock" title="Rock">
-                       
                             <p>Rock</p>
                         </button>
                         <button class="choice-btn" data-move="Paper" title="Paper">
-                       
                             <p>Paper</p>
                         </button>
                         <button class="choice-btn" data-move="Scissors" title="Scissors">
-                      
                             <p>Scissors</p>
                         </button>
                         <button class="choice-btn" data-move="Lizard" title="Lizard">
-                  
                             <p>Lizard</p>
                         </button>
                         <button class="choice-btn" data-move="Spock" title="Spock">
-                          
                             <p>Spock</p>
                         </button>
                     </div>
@@ -95,6 +88,75 @@
                     </div>
                 </div>
             </div>
+            <!-- End CPU Mode Section -->
+            
+            <!-- PvP Mode Section -->
+            <div id="pvpSection" style="display: none;">
+                <div class="row mb-4">
+                    <div class="col-12 text-center">
+                        <h3 class="mb-4">Player vs Player Mode</h3>
+                    </div>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6 text-center">
+                        <button id="player1SelectBtn" class="btn btn-primary btn-lg w-100 mb-3">Player 1: Make Your Choice</button>
+                        <div id="player1InputSection" style="display: none;">
+                            <p class="text-muted">Choose your move:</p>
+                            <div class="choices-grid">
+                                <button class="pvp-choice-btn" data-player="1" data-move="Rock" title="Rock">
+                                    <p>Rock</p>
+                                </button>
+                                <button class="pvp-choice-btn" data-player="1" data-move="Paper" title="Paper">
+                                    <p>Paper</p>
+                                </button>
+                                <button class="pvp-choice-btn" data-player="1" data-move="Scissors" title="Scissors">
+                                    <p>Scissors</p>
+                                </button>
+                                <button class="pvp-choice-btn" data-player="1" data-move="Lizard" title="Lizard">
+                                    <p>Lizard</p>
+                                </button>
+                                <button class="pvp-choice-btn" data-player="1" data-move="Spock" title="Spock">
+                                    <p>Spock</p>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 text-center">
+                        <button id="player2SelectBtn" class="btn btn-warning btn-lg w-100 mb-3">Player 2: Make Your Choice</button>
+                        <div id="player2InputSection" style="display: none;">
+                            <p class="text-muted">Choose your move:</p>
+                            <div class="choices-grid">
+                                <button class="pvp-choice-btn" data-player="2" data-move="Rock" title="Rock">
+                                    <p>Rock</p>
+                                </button>
+                                <button class="pvp-choice-btn" data-player="2" data-move="Paper" title="Paper">
+                                    <p>Paper</p>
+                                </button>
+                                <button class="pvp-choice-btn" data-player="2" data-move="Scissors" title="Scissors">
+                                    <p>Scissors</p>
+                                </button>
+                                <button class="pvp-choice-btn" data-player="2" data-move="Lizard" title="Lizard">
+                                    <p>Lizard</p>
+                                </button>
+                                <button class="pvp-choice-btn" data-player="2" data-move="Spock" title="Spock">
+                                    <p>Spock</p>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-12 text-center">
+                        <button id="determineWinnerBtn" class="btn btn-success btn-lg" style="display: none;">Show Results</button>
+                    </div>
+                </div>
+                
+                <div id="pvpResult" class="mt-4"></div>
+            </div>
+            <!-- End PvP Mode Section -->
 
             <div class="row mt-5">
                 <div class="col-12">

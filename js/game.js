@@ -6,12 +6,85 @@ const moveEmojis = {
     'Spock': '🖖'
 };
 
-// Event Listeners
+// Store PvP choices
+let pvpChoices = {
+    player1: null,
+    player2: null
+};
+
+// ==================== MODE TOGGLE ====================
+document.getElementById('cpuToggleBtn').addEventListener('click', toggleCPUMode);
+document.getElementById('pvpToggleBtn').addEventListener('click', togglePvPMode);
+
+// ==================== PvP EVENT LISTENERS ====================
+document.getElementById('player1SelectBtn').addEventListener('click', showPlayer1Input);
+document.getElementById('player2SelectBtn').addEventListener('click', showPlayer2Input);
 document.getElementById('determineWinnerBtn').addEventListener('click', playPvP);
 
+document.querySelectorAll('.pvp-choice-btn').forEach(button => {
+    button.addEventListener('click', recordPvPChoice);
+});
+
+// ==================== CPU EVENT LISTENERS ====================
 document.querySelectorAll('.choice-btn').forEach(button => {
     button.addEventListener('click', playGame);
 });
+
+// ==================== MODE TOGGLE FUNCTIONS ====================
+function toggleCPUMode() {
+    document.getElementById('cpuSection').style.display = 'block';
+    document.getElementById('pvpSection').style.display = 'none';
+    document.getElementById('cpuToggleBtn').classList.remove('btn-outline-success');
+    document.getElementById('cpuToggleBtn').classList.add('btn-success');
+    document.getElementById('pvpToggleBtn').classList.remove('btn-success');
+    document.getElementById('pvpToggleBtn').classList.add('btn-outline-success');
+    resetGame();
+}
+
+function togglePvPMode() {
+    document.getElementById('pvpSection').style.display = 'block';
+    document.getElementById('cpuSection').style.display = 'none';
+    document.getElementById('pvpToggleBtn').classList.remove('btn-outline-success');
+    document.getElementById('pvpToggleBtn').classList.add('btn-success');
+    document.getElementById('cpuToggleBtn').classList.remove('btn-success');
+    document.getElementById('cpuToggleBtn').classList.add('btn-outline-success');
+    resetPvP();
+}
+
+// ==================== PvP MODE FUNCTIONS ====================
+function showPlayer1Input() {
+    document.getElementById('player1InputSection').style.display = 'block';
+    document.getElementById('player1SelectBtn').style.display = 'none';
+}
+
+function showPlayer2Input() {
+    document.getElementById('player2InputSection').style.display = 'block';
+    document.getElementById('player2SelectBtn').style.display = 'none';
+}
+
+function recordPvPChoice(event) {
+    const playerNum = event.currentTarget.getAttribute('data-player');
+    const move = event.currentTarget.getAttribute('data-move');
+    
+    pvpChoices[`player${playerNum}`] = move;
+    
+    if (playerNum === '1') {
+        document.getElementById('player1InputSection').style.display = 'none';
+        document.getElementById('player1SelectBtn').style.display = 'block';
+        document.getElementById('player1SelectBtn').textContent = '✓ Player 1: Choice Made';
+        document.getElementById('player1SelectBtn').disabled = true;
+    } else {
+        document.getElementById('player2InputSection').style.display = 'none';
+        document.getElementById('player2SelectBtn').style.display = 'block';
+        document.getElementById('player2SelectBtn').textContent = '✓ Player 2: Choice Made';
+        document.getElementById('player2SelectBtn').disabled = true;
+    }
+    
+    // Show determine winner button if both made choices
+    if (pvpChoices.player1 && pvpChoices.player2) {
+        document.getElementById('determineWinnerBtn').style.display = 'inline-block';
+    }
+}
 
 function playGame(event) {
     const move = event.currentTarget.getAttribute('data-move');
@@ -20,23 +93,14 @@ function playGame(event) {
 
 // PvP Mode
 function playPvP() {
-    const player1Move = document.getElementById('player1Choice').value.trim();
-    const player2Move = document.getElementById('player2Choice').value.trim();
+    const player1Move = pvpChoices.player1;
+    const player2Move = pvpChoices.player2;
 
-    const validMoves = ['Rock', 'Paper', 'Scissors', 'Lizard', 'Spock'];
+    const result = comparePvPMoves(player1Move, player2Move);
+    document.getElementById('pvpResult').innerHTML = result;
     
-    // Capitalize input
-    const player1Capitalized = player1Move.charAt(0).toUpperCase() + player1Move.slice(1).toLowerCase();
-    const player2Capitalized = player2Move.charAt(0).toUpperCase() + player2Move.slice(1).toLowerCase();
-
-    // Validate inputs
-    if (!validMoves.includes(player1Capitalized) || !validMoves.includes(player2Capitalized)) {
-        alert('Please enter valid moves: Rock, Paper, Scissors, Lizard, or Spock');
-        return;
-    }
-
-    const result = comparePvPMoves(player1Capitalized, player2Capitalized);
-    document.getElementById('result').innerHTML = result;
+    // Show reset button option
+    document.getElementById('determineWinnerBtn').style.display = 'none';
 }
 
 function comparePvPMoves(player1Move, player2Move) {
@@ -51,15 +115,31 @@ function comparePvPMoves(player1Move, player2Move) {
     let resultText = `<div class="text-center"><h4>${moveEmojis[player1Move]} vs ${moveEmojis[player2Move]}</h4>`;
 
     if (player1Move === player2Move) {
-        resultText += `<p class="draw">It's a tie! Both chose ${player1Move}!</p>`;
+        resultText += `<p class="draw"><strong>It's a tie! Both chose ${player1Move}!</strong></p>`;
     } else if (winConditions[player1Move].includes(player2Move)) {
-        resultText += `<p class="win">Player 1 wins! ${player1Move} beats ${player2Move}!</p>`;
+        resultText += `<p class="win"><strong>Player 1 wins! ${player1Move} beats ${player2Move}!</strong></p>`;
     } else {
-        resultText += `<p class="lose">Player 2 wins! ${player2Move} beats ${player1Move}!</p>`;
+        resultText += `<p class="lose"><strong>Player 2 wins! ${player2Move} beats ${player1Move}!</strong></p>`;
     }
     
-    resultText += '</div>';
+    resultText += '<button class="btn btn-primary mt-3" onclick="resetPvP()">Play Again</button></div>';
     return resultText;
+}
+
+function resetPvP() {
+    pvpChoices = { player1: null, player2: null };
+    document.getElementById('player1SelectBtn').textContent = 'Player 1: Make Your Choice';
+    document.getElementById('player1SelectBtn').disabled = false;
+    document.getElementById('player1SelectBtn').style.display = 'block';
+    document.getElementById('player1InputSection').style.display = 'none';
+    
+    document.getElementById('player2SelectBtn').textContent = 'Player 2: Make Your Choice';
+    document.getElementById('player2SelectBtn').disabled = false;
+    document.getElementById('player2SelectBtn').style.display = 'block';
+    document.getElementById('player2InputSection').style.display = 'none';
+    
+    document.getElementById('determineWinnerBtn').style.display = 'none';
+    document.getElementById('pvpResult').innerHTML = '';
 }
 
 // CPU Mode - Helper function to determine winner
