@@ -15,24 +15,66 @@ function playGame(event) {
     playRound(move);
 }
 
+function determineWinner(playerMove, cpuMove) {
+    const winConditions = {
+        'Rock': ['Scissors', 'Lizard'],
+        'Paper': ['Rock', 'Spock'],
+        'Scissors': ['Paper', 'Lizard'],
+        'Lizard': ['Paper', 'Spock'],
+        'Spock': ['Rock', 'Scissors']
+    };
+
+    let outcome = 'Draw';
+    let message = '';
+
+    if (playerMove === cpuMove) {
+        outcome = 'Draw';
+        message = "It's a tie!";
+    } else if (winConditions[playerMove].includes(cpuMove)) {
+        outcome = 'Win';
+        message = `${playerMove} ${getAction(playerMove, cpuMove)} ${cpuMove}!`;
+    } else {
+        outcome = 'Lose';
+        message = `${cpuMove} ${getAction(cpuMove, playerMove)} ${playerMove}!`;
+    }
+
+    return {
+        playerMove: playerMove,
+        cpuMove: cpuMove,
+        outcome: outcome,
+        message: message
+    };
+}
+
+function getAction(winner, loser) {
+    const actions = {
+        'Rock': { 'Scissors': 'crushes', 'Lizard': 'crushes' },
+        'Paper': { 'Rock': 'covers', 'Spock': 'disproves' },
+        'Scissors': { 'Paper': 'cuts', 'Lizard': 'decapitates' },
+        'Lizard': { 'Paper': 'eats', 'Spock': 'poisons' },
+        'Spock': { 'Rock': 'vaporizes', 'Scissors': 'smashes' }
+    };
+    return actions[winner][loser] || 'beats';
+}
+
 async function playRound(playerMove) {
     // Show loading state
     showLoadingState();
 
     try {
         const response = await fetch('https://guptilllsg2526-fqapfdeffbdegwc5.westus3-01.azurewebsites.net/api/Game/random', {
-            method: 'POST',
+            method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ move: playerMove })
+            }
         });
 
         if (!response.ok) {
-            throw new Error('Failed to play game');
+            throw new Error('Failed to get CPU move');
         }
 
-        const result = await response.json();
+        const cpuMove = await response.json();
+        const result = determineWinner(playerMove, cpuMove);
         displayResult(result);
     } catch (error) {
         console.error('Error:', error);
