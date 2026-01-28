@@ -73,7 +73,14 @@ async function playRound(playerMove) {
             throw new Error('Failed to get CPU move');
         }
 
-        const cpuMove = await response.json();
+        let cpuMove = await response.text();
+        
+        // Remove quotes if they exist (from JSON string response)
+        cpuMove = cpuMove.replace(/^["']|["']$/g, '');
+        
+        // Capitalize first letter
+        cpuMove = cpuMove.charAt(0).toUpperCase() + cpuMove.slice(1).toLowerCase();
+        
         const result = determineWinner(playerMove, cpuMove);
         displayResult(result);
     } catch (error) {
