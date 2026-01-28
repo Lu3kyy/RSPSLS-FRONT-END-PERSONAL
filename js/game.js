@@ -6,6 +6,9 @@ const moveEmojis = {
     'Spock': '🖖'
 };
 
+// Event Listeners
+document.getElementById('determineWinnerBtn').addEventListener('click', playPvP);
+
 document.querySelectorAll('.choice-btn').forEach(button => {
     button.addEventListener('click', playGame);
 });
@@ -15,13 +18,102 @@ function playGame(event) {
     playRound(move);
 }
 
-function determineWinner(playerMove, cpuMove) {
+// PvP Mode
+function playPvP() {
+    const player1Move = document.getElementById('player1Choice').value.trim();
+    const player2Move = document.getElementById('player2Choice').value.trim();
+
+    const validMoves = ['Rock', 'Paper', 'Scissors', 'Lizard', 'Spock'];
+    
+    // Capitalize input
+    const player1Capitalized = player1Move.charAt(0).toUpperCase() + player1Move.slice(1).toLowerCase();
+    const player2Capitalized = player2Move.charAt(0).toUpperCase() + player2Move.slice(1).toLowerCase();
+
+    // Validate inputs
+    if (!validMoves.includes(player1Capitalized) || !validMoves.includes(player2Capitalized)) {
+        alert('Please enter valid moves: Rock, Paper, Scissors, Lizard, or Spock');
+        return;
+    }
+
+    const result = comparePvPMoves(player1Capitalized, player2Capitalized);
+    document.getElementById('result').innerHTML = result;
+}
+
+function comparePvPMoves(player1Move, player2Move) {
     const winConditions = {
         'Rock': ['Scissors', 'Lizard'],
         'Paper': ['Rock', 'Spock'],
         'Scissors': ['Paper', 'Lizard'],
-        'Lizard': ['Paper', 'Spock'],
-        'Spock': ['Rock', 'Scissors']
+        'Lizard': ['Spock', 'Paper'],
+        'Spock': ['Scissors', 'Rock']
+    };
+
+    let resultText = `<div class="text-center"><h4>${moveEmojis[player1Move]} vs ${moveEmojis[player2Move]}</h4>`;
+
+    if (player1Move === player2Move) {
+        resultText += `<p class="draw">It's a tie! Both chose ${player1Move}!</p>`;
+    } else if (winConditions[player1Move].includes(player2Move)) {
+        resultText += `<p class="win">Player 1 wins! ${player1Move} beats ${player2Move}!</p>`;
+    } else {
+        resultText += `<p class="lose">Player 2 wins! ${player2Move} beats ${player1Move}!</p>`;
+    }
+    
+    resultText += '</div>';
+    return resultText;
+}
+
+// CPU Mode - Helper function to determine winner
+function getAction(winner, loser) {
+    const actions = {
+        'Rock': { 'Scissors': 'crushes', 'Lizard': 'crushes' },
+        'Paper': { 'Rock': 'covers', 'Spock': 'disproves' },
+        'Scissors': { 'Paper': 'cuts', 'Lizard': 'decapitates' },
+        'Lizard': { 'Paper': 'eats', 'Spock': 'poisons' },
+        'Spock': { 'Rock': 'vaporizes', 'Scissors': 'smashes' }
+    };
+    return actions[winner][loser] || 'beats';
+}
+
+function playRound(playerMove) {
+    // Show loading state
+    showLoadingState();
+
+    const cpuEndpoint = 'https://guptilllsg2526-fqapfdeffbdegwc5.westus3-01.azurewebsites.net/api/Game/random';
+
+    fetch(cpuEndpoint, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.text();
+    })
+    .then(cpuMove => {
+        // Clean the response
+        cpuMove = cpuMove.replace(/^["']|["']$/g, '').trim();
+        cpuMove = cpuMove.charAt(0).toUpperCase() + cpuMove.slice(1).toLowerCase();
+        
+        const result = determineCPUWinner(playerMove, cpuMove);
+        displayResult(result);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        resetUI();
+        alert('Error: Unable to get CPU move. Please try again.');
+    });
+}
+
+function determineCPUWinner(playerMove, cpuMove) {
+    const winConditions = {
+        'Rock': ['Scissors', 'Lizard'],
+        'Paper': ['Rock', 'Spock'],
+        'Scissors': ['Paper', 'Lizard'],
+        'Lizard': ['Spock', 'Paper'],
+        'Spock': ['Scissors', 'Rock']
     };
 
     let outcome = 'Draw';
@@ -44,50 +136,6 @@ function determineWinner(playerMove, cpuMove) {
         outcome: outcome,
         message: message
     };
-}
-
-function getAction(winner, loser) {
-    const actions = {
-        'Rock': { 'Scissors': 'crushes', 'Lizard': 'crushes' },
-        'Paper': { 'Rock': 'covers', 'Spock': 'disproves' },
-        'Scissors': { 'Paper': 'cuts', 'Lizard': 'decapitates' },
-        'Lizard': { 'Paper': 'eats', 'Spock': 'poisons' },
-        'Spock': { 'Rock': 'vaporizes', 'Scissors': 'smashes' }
-    };
-    return actions[winner][loser] || 'beats';
-}
-
-async function playRound(playerMove) {
-    // Show loading state
-    showLoadingState();
-
-    try {
-        const response = await fetch('https://guptilllsg2526-fqapfdeffbdegwc5.westus3-01.azurewebsites.net/api/Game/random', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to get CPU move');
-        }
-
-        let cpuMove = await response.text();
-        
-        // Remove quotes if they exist (from JSON string response)
-        cpuMove = cpuMove.replace(/^["']|["']$/g, '');
-        
-        // Capitalize first letter
-        cpuMove = cpuMove.charAt(0).toUpperCase() + cpuMove.slice(1).toLowerCase();
-        
-        const result = determineWinner(playerMove, cpuMove);
-        displayResult(result);
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Error playing game. Please try again.');
-        resetUI();
-    }
 }
 
 function showLoadingState() {
