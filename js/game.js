@@ -20,7 +20,7 @@ async function playRound(playerMove) {
     showLoadingState();
 
     try {
-        const response = await fetch('http://localhost:5001/api/game/play', {
+        const response = await fetch('https://guptilllsg2526-fqapfdeffbdegwc5.westus3-01.azurewebsites.net/api/Game/random', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
